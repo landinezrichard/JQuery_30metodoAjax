@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8"/>
+		<title>30 Metodo Ajax</title>
+		
+		<!--Hojas de estilo -->		
+		<style type="text/css">
+			body,html{
+				background:#FFF;
+				margin:0;
+				padding:0;
+			}
+						
+			div{				
+				display:block;
+				margin:0 auto;
+				height:100px;				
+				width:400px;
+			}
+
+			#caja1{
+				background:#00ff00;				
+			}
+			
+			#caja2{
+				background:#871f78;				
+			}
+		</style>
+				
+		<!--Scripts Aca -->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js">		
+		</script>
+		<script type="text/javascript" src="spin-min.js">		
+		</script>
+		<script type="text/javascript" src="jquery-spin.js">		
+		</script>
+			
+		<script type="text/javascript">
+		
+			//el pluguin spiner, crea un icono de cargando, sin usar gifs, sino con JQuery
+			//http://www.myjqueryplugins.com/jquery-plugin/spinjs
+			
+			$(document).on("ready",function(){
+				//sacamos del formulario la url a la que se le va a hacer la peticion:
+				var peticion=$("#principal form").attr("action");
+				
+				//sacamos del formulario el tipo de metodo(get o post):
+				var metodo=$("#principal form").attr("method");
+				
+				$("#principal form").on("submit",function(evento){
+					//evitamos el envio normal del formulario
+					evento.preventDefault();
+					
+					
+					$.ajax({
+						beforeSend: function(){
+								//cargamos la imagen de cargando
+								$("#estatus").spin('miCustom');
+								//armamos la info para enviar al server
+								//una por una: var nom=document.formulario1.nombre.value; ... 
+								//y luego creamos un objeto Json y lo enviamos en data
+								//{nombre: nombre,email:email,mensaje:mensaje}
+								//o todas de una vez con serialize								
+							},
+							url:peticion,
+							type:metodo,
+							data: $("#principal form").serialize(),
+							success:function(resp){
+								if(resp == "Correcto"){
+									$("#estatus").html("<img src='ok.png'>");
+								}else{
+									$("#estatus").html("<img src='x.png'>");
+									console.log(resp);
+								}
+							},
+							error:function(jqXHR,estado,error){
+								$("#estatus").html("<img src='x.png'>");
+								console.log(estado);
+								console.log(error);
+							},
+							complete:function(jqXHR,estado){
+								console.log(estado);
+							},
+							timeout:10000
+					});
+					
+				});				
+			});
+		
+		</script>
+		
+	</head>
+	<body>
+		<div id="principal">
+			<h1>Formulario de Contacto</h1>
+			<form name="formulario1" method="post" action="validar.php">
+				<label for="nombre">Nombre:</label>
+				<input type="text" id="nombre" name="nombre" /><br/>
+				<label for="email">Email:</label>
+				<input type="text" id="email" name="email"/><br/>
+				<label for="mensaje">Mensaje:</label>
+				<textarea type="text" id="mensaje" name="mensaje"></textarea><br/>
+				<input type="submit" value="Validar datos"/>
+				<div id="estatus"></div>
+			</form>		
+		</div>
+	</body>
+</html>
